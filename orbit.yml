@@ -53,7 +53,9 @@ tasks:
       - orbit run graylog-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
       - orbit run php-fpm-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
       - orbit run nginx-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
+      - orbit run mongodb-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
       - orbit run mysql-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
+      - orbit run neo4j-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
       - orbit run redis-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
       - orbit run rabbitmq-build -f config/orbit/orbit-build.yml {{ if debug }}-d{{ end }}
       - orbit generate -f config/orbit/whale.txt -p "Notification,Your configuration files have been successfully generated!" {{ if debug }}-d{{ end }}
@@ -90,11 +92,13 @@ tasks:
       - orbit run php-fpm-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
       - orbit run nginx-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
       - orbit run mysql-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
+      - orbit run mongodb-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
+      - orbit run neo4j-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
       - orbit run redis-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
       - orbit run rabbitmq-up -f config/orbit/orbit-up.yml {{ if debug }}-d{{ end }}
       - orbit generate -f config/orbit/whale.txt -p "Notification,Your containers have been successfully started!" {{ if debug }}-d{{ end }}
       - docker ps
-      
+
   # |--------------------------------------------------------------------------
   # | orbit run proxy-down
   # |--------------------------------------------------------------------------
@@ -128,6 +132,8 @@ tasks:
       - orbit run nginx-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
       - orbit run docker-sync-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
       - orbit run mysql-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
+      - orbit run mongodb-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
+      - orbit run neo4j-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
       - orbit run redis-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
       - orbit run rabbitmq-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}
       - orbit run toolbox-down -f config/orbit/orbit-down.yml {{ if debug }}-d{{ end }}

@@ -112,6 +112,39 @@ tasks:
       {{ end }}
 
   # |--------------------------------------------------------------------------
+  # | orbit run mongodb-down
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops the MongoDB container.
+  # |
+  # | They should be stop before the Graylog containers.
+  # |
+
+  - use: mongodb-down
+    run:
+      {{ if eq true .Orbit.Modules.mongodb.enable }}
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/mongodb/docker-compose.yml down
+      {{ else }}
+      - echo Skipping MongoDB container shutdown ...
+      {{ end }}
+
+  # |--------------------------------------------------------------------------
+  # | orbit run neo4j-down
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops the Neo4J container.
+  # |
+  # | They should be stop before the Graylog containers.
+  # |
+
+  - use: neo4j-down
+    run:
+      {{ if eq true .Orbit.Modules.neo4j.enable }}
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/neo4j/docker-compose.yml down
+      {{ else }}
+      - echo Skipping Neo4J container shutdown ...
+      {{ end }}
+  # |--------------------------------------------------------------------------
   # | orbit run redis-down
   # |--------------------------------------------------------------------------
   # |

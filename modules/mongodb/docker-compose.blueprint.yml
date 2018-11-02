@@ -1,0 +1,82 @@
+{{- $virtualhost := index (pick .Orbit.Project.virtualhost .Orbit.EnvFile.ENV) .Orbit.EnvFile.ENV -}}
+version: '3.3'
+
+
+services:
+  mongodb:
+    image: mongo:{{ .Orbit.Modules.mongodb.version }}
+    container_name: {{ .Orbit.EnvFile.ENV }}-{{ .Orbit.Project.name }}-mongodb
+    restart: {{ if and (ne "local" .Orbit.EnvFile.ENV) (eq false .Orbit.Modules.graylog.enable) }}unless-stopped{{ else }}"no"{{ end }}
+    networks:
+      - backend
+    {{- if eq "true" .Orbit.EnvFile.MONGO_ENABLE_PORTS_MAPPING }}
+    ports:
+      - 27017:27017
+      - 27018:27018
+    {{- end }}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME={{ .Orbit.Modules.mongodb.user }}
+      - MONGO_INITDB_ROOT_PASSWORD=/run/secrets/mongodb_root_password
+    secrets:
+      - mongodb_root_password
+    labels:
+      - traefik.enable=false
+    volumes:
+      - mongodb_data:/data/db
+    # TODO Fix me
+    # {{- if eq true .Orbit.Modules.graylog.enable }}
+    # logging:
+    #   driver: gelf
+    #   options:
+    #     gelf-address: udp://localhost:{{ .Orbit.EnvFile.GRAYLOG_PORT }}
+    # {{ end }}
+  {{ if eq "local" .Orbit.EnvFile.ENV }}
+  mongodb-express:
+    image: mongo-express
+    container_name: {{ .Orbit.EnvFile.ENV }}-{{ .Orbit.Project.name }}-mongodbexpress
+    restart: "no"
+    # TODO Remove this once the overlay network is working
+    links:
+      - mongodb
+    networks:
+      - proxy
+      - backend
+    environment:
+      # TODO Change the endpoint to use the overlay network once connecting
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_ADMINUSERNAME={{ .Orbit.Modules.mongodb.user }}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=/run/secrets/mongodb_root_password
+    secrets:
+      - mongodb_root_password
+    labels:
+      - traefik.backend={{ .Orbit.EnvFile.ENV }}-{{ .Orbit.Project.name }}-mongodbexpress
+      {{- if eq "true" .Orbit.EnvFile.TRAEFIK_PREFIX }}
+      - traefik.frontend.rule=Host:mongodbexpress-{{ .Orbit.EnvFile.ENV }}.{{ $virtualhost }}
+      {{- else }}
+      - traefik.frontend.rule=Host:mongodbexpress.{{ $virtualhost }}
+      {{- end }}
+      - traefik.port=8081
+      - traefik.docker.network=kickoff_proxy
+  {{ end }}
+networks:
+
+
+  proxy:
+    external:
+      name: kickoff_proxy
+
+
+  backend:
+    external:
+      name: {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }}_backend
+
+
+secrets:
+
+  mongodb_root_password:
+    file: ./secrets/mongodb_root_password.txt
+
+volumes:
+
+  mongodb_data:
+    driver: local

@@ -109,6 +109,50 @@ tasks:
       {{ end }}
 
   # |--------------------------------------------------------------------------
+  # | orbit run mongodb-up
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts the MongoDB container.
+  # |
+  # | On "local" environment, also starts the Mongo Express container.
+  # |
+  # | They should be start after the Graylog containers.
+  # |
+
+  - use: mongodb-up
+    run:
+      {{ if eq true .Orbit.Modules.mongodb.enable }}
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/mongodb/docker-compose.yml up -d
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/toolbox/docker-compose.yml run --rm toolbox /bin/sh -c "/scripts/health-check.sh MongoDB mongodb 27017"
+      {{ if eq "local" .Orbit.EnvFile.ENV }}
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/toolbox/docker-compose.yml run --rm toolbox /bin/sh -c "/scripts/health-check.sh MongoExpress mongodb-express 8081"
+      {{ end }}
+      {{ else }}
+      - echo Skipping MongoDB container startup ...
+      {{ end }}
+
+  # |--------------------------------------------------------------------------
+  # | orbit run neo4j-up
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts the Neo4J container.
+  # |
+  # | They should be start after the Graylog containers.
+  # |
+
+  - use: neo4j-up
+    run:
+      {{ if eq true .Orbit.Modules.neo4j.enable }}
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/neo4j/docker-compose.yml up -d
+      - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/toolbox/docker-compose.yml run --rm toolbox /bin/sh -c "/scripts/health-check.sh Neo4J neo4j 7474"
+      {{ else }}
+      - echo Skipping Neo4J container startup ...
+      {{ end }}
+
+
+
+
+  # |--------------------------------------------------------------------------
   # | orbit run redis-up
   # |--------------------------------------------------------------------------
   # |

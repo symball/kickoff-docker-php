@@ -20,7 +20,7 @@ graylog:
   # | If true, enables Graylog.
   # |
 
-  enable: true
+  enable: false
 
   # |--------------------------------------------------------------------------
   # | Graylog user
@@ -28,6 +28,27 @@ graylog:
   # |
   # | The Graylog root user.
   # |
+
+  user: kickoff
+
+mongodb:
+
+  # |--------------------------------------------------------------------------
+  # | Enable MongoDB
+  # |--------------------------------------------------------------------------
+  # |
+  # | If true, enables MongoDB and makes sure support module is present in PHP.
+  # |
+
+  enable: false
+
+  # |--------------------------------------------------------------------------
+  # | Mongo Version
+  # |--------------------------------------------------------------------------
+  # |
+  # | Determine which tag from Docker Hub to use
+  # |
+  version: 3
 
   user: kickoff
 
@@ -62,9 +83,26 @@ mysql:
   # |
 
   databases:
-    - my_awesome_database
-    - my_genious_database
-    - my_ok_database
+    - symfony
+
+neo4j:
+
+  # |--------------------------------------------------------------------------
+  # | Enable Neo4J
+  # |--------------------------------------------------------------------------
+  # |
+  # | If true, enables Neo4J.
+  # |
+
+  enable: true
+
+  # |--------------------------------------------------------------------------
+  # | Neo4J Version
+  # |--------------------------------------------------------------------------
+  # |
+  # | Determine which tag from Docker Hub to use
+  # |
+  version: 3.4
 
 redis:
 
@@ -75,7 +113,7 @@ redis:
   # | If true, enables Redis.
   # |
 
-  enable: true
+  enable: false
 
 rabbitmq:
 
@@ -86,7 +124,7 @@ rabbitmq:
   # | If true, enables RabbitMQ.
   # |
 
-  enable: true
+  enable: false
 
   # |--------------------------------------------------------------------------
   # | RabbitMQ user

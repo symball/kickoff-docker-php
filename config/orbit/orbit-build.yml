@@ -92,9 +92,26 @@ tasks:
 
   - use: nginx-build
     run:
+      - orbit generate -f modules/nginx/conf.d/php-fpm.blueprint.conf -o modules/nginx/conf.d/php-fpm.conf {{ if debug }}-d{{ end }}
       - orbit generate -f modules/nginx/docker-compose.blueprint.yml -o modules/nginx/docker-compose.yml {{ if debug }}-d{{ end }}
       - orbit run script-fix-permissions-nginx -f config/orbit/orbit-scripts.yml {{ if debug }}-d{{ end }}
       - docker-compose -p {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }} -f modules/nginx/docker-compose.yml build
+
+  # |--------------------------------------------------------------------------
+  # | orbit run mongo-build
+  # |--------------------------------------------------------------------------
+  # |
+  # | Generates Mongo configuration files.
+  # |
+
+  - use: mongodb-build
+    run:
+      {{ if eq true .Orbit.Modules.mongodb.enable }}
+      - orbit generate -f modules/mongodb/docker-compose.blueprint.yml -o modules/mongodb/docker-compose.yml {{ if debug }}-d{{ end }}
+      - orbit generate -f modules/mongodb/secrets/mongodb_root_password.blueprint.txt -o modules/mongodb/secrets/mongodb_root_password.txt {{ if debug }}-d{{ end }}
+      {{ else }}
+      - echo Skipping MongoDB configuration files generation ...
+      {{ end }}
 
   # |--------------------------------------------------------------------------
   # | orbit run mysql-build
@@ -114,6 +131,20 @@ tasks:
       - echo Skipping MySQL configuration files generation ...
       {{ end }}
 
+  # |--------------------------------------------------------------------------
+  # | orbit run neo4j-build
+  # |--------------------------------------------------------------------------
+  # |
+  # | Generates Neo4J configuration files.
+  # |
+
+  - use: neo4j-build
+    run:
+      {{ if eq true .Orbit.Modules.neo4j.enable }}
+      - orbit generate -f modules/neo4j/docker-compose.blueprint.yml -o modules/neo4j/docker-compose.yml {{ if debug }}-d{{ end }}
+      {{ else }}
+      - echo Skipping Neo4J configuration files generation ...
+      {{ end }}
   # |--------------------------------------------------------------------------
   # | orbit run redis-build
   # |--------------------------------------------------------------------------

@@ -1,0 +1,52 @@
+{{- $virtualhost := index (pick .Orbit.Project.virtualhost .Orbit.EnvFile.ENV) .Orbit.EnvFile.ENV -}}
+version: '3.3'
+
+
+services:
+
+
+  neo4j:
+    # image: neo4j:{{ .Orbit.Modules.neo4j.version }}
+    container_name: {{ .Orbit.EnvFile.ENV }}-{{ .Orbit.Project.name }}-neo4j
+    build:
+      context: .
+    networks:
+      - backend
+    {{- if eq "true" .Orbit.EnvFile.NEO4J_ENABLE_PORTS_MAPPING }}
+    ports:
+      - 7473:7473
+      - 7474:7474
+      - 7687:7687
+    {{- end }}
+    labels:
+      - traefik.backend={{ .Orbit.EnvFile.ENV }}-{{ .Orbit.Project.name }}-neo4j
+      {{- if eq "true" .Orbit.EnvFile.TRAEFIK_PREFIX }}
+      - traefik.frontend.rule=Host:neo4j-{{ .Orbit.EnvFile.ENV }}.{{ $virtualhost }}
+      {{- else }}
+      - traefik.frontend.rule=Host:neo4j.{{ $virtualhost }}
+      {{- end }}
+      - traefik.port=7474
+      - traefik.docker.network=kickoff_proxy
+    volumes:
+      - neo4j_data:/data
+    {{- if eq true .Orbit.Modules.graylog.enable }}
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://localhost:{{ .Orbit.EnvFile.GRAYLOG_PORT }}
+    {{ end }}
+
+networks:
+    proxy:
+      external:
+        name: kickoff_proxy
+
+    backend:
+      external:
+        name: {{ .Orbit.EnvFile.ENV }}{{ .Orbit.Project.name }}_backend
+
+volumes:
+
+
+  neo4j_data:
+    driver: local

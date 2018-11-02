@@ -1,3 +1,6 @@
 .docker-sync
 .idea
+.directory
 docker-sync.yml
+/app
+!/app/.gitkeep

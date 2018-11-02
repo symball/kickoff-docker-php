@@ -9,7 +9,7 @@
 # | Caution: use only alphabetical character
 # |
 
-name: myawesomeproject
+name: tripaggo
 
 # |--------------------------------------------------------------------------
 # | Project base virtual host
@@ -31,7 +31,7 @@ name: myawesomeproject
 # |
 
 virtualhost:
-  local: my-awesome-project.local
-  test: my-awesome-project.local
-  staging: my-awesome-project.com
-  production: my-awesome-project.com
+  local: tripaggo.local
+  test: tripaggo.local
+  staging: tripaggo.com
+  production: tripaggo.com
